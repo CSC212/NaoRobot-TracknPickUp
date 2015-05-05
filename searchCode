@@ -1,0 +1,48 @@
+from naoqi import ALProxy
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.text = ALProxy("ALTextToSpeech")
+        self.move =ALProxy("ALMotion")
+        self.color = ALProxy("ALColorBlobDectection")
+
+        self.color.setColor(216,225,16,50)
+        self.color.setObjectProperties(15,.050,"Circle")
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        #self.onStopped() #activate the output of the box
+        names = ['HeadYaw','HeadPitch']
+        times = [[2.0],[2,0]]
+        self.move.angleInterpolation(names,[0.0,0.3],times,True)
+        p = False
+        self.stopIt(p)
+        self.move.angleInterpolation(names,[0.0,0.1],times,True)
+        self.onStopped()
+        pass
+
+    def onInput_onStop(self):
+        self.stopIt(True)
+        #self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        #self.onStopped() #activate the output of the box
+
+    def stopIt(self,p):
+        names = ['HeadYaw','HeadPitch']
+        times = [[2.0],[2,0]]
+        count = 0
+        if p == True:
+            self.text.say("found the ball")
+
+        while p == False;
+            self.move.angleInterpolation(names,[1.0,0.3],times,True)
+            self.move.angleInterpolation(names,[-1.0,0.3],times,True)
+        count = count+1
+        if count == 3:
+            p = True
