@@ -33,32 +33,115 @@
 
 <p>using Nao choregraphe 2.1.2 this is a program for nao to track a yellow ball and pick it up</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>FLOW diagram for choregraphe 2.1.2 is(each on is a box)</p>
+
+<p>Almemory(leftfootbumperpressed) -&gt; OnlyOnce(a) -&gt; (inputOnStart) tracker -&gt; (inputOnstart)Tracker -&gt;(inputOnstart)Search
+OnlyOnce(a) -&gt; Openhands -&gt; (inputOnStart)Timeline(grabs motion) -&gt; (inputOnStart)MoveTo -&gt; Exit
+AlMemory(colorblobdetected) -&gt; ONlyOnce(b) -&gt; (OnStopInput)Search
+AutoControl</p>
+
+<p>tracking code:</p>
+
+<p>from naoqi import ALProxy</p>
+
+<p>class MyClass(GeneratedClass):
+    def <strong>init</strong>(self):
+        GeneratedClass.<strong>init</strong>(self)
+        self.text = ALProxy("ALTextToSpeech")
+        self.tracker = ALProxy("ALTracker")
+        self.posture = ALProxy("ALRobotPosture")
+        self.move =ALProxy("ALMotion")
+        self.color = ALProxy("ALColorBlobDectection")</p>
+
+<pre><code>    self.color.setColor(216,225,16,50)
+    self.color.setObjectProperties(15,.050,"Circle")
+
+def onLoad(self):
+    names = ['HeadYaw','HeadPitch']
+    times = [[2.0],[2,0]]
+    self.text.say("Hi guy")
+    event = "ALTracker/ColorBlobDetected"
+    self.posture.goToPosture("StandInit",0.5)
+
+    self.tracker.setMode("Move")
+    self.tracker.setRelativePosition([0.4,0.0,0.0,0.1,0.1,0.3])
+    self.tracker.trackEvent(event)
+    self.move.angleInterpolation(names,[0.0,0.3],times,True)
+    self.text.say("Looking for the ball")
+    self.onStopped()
+    #put initialization code here
+
+    pass
+
+def onUnload(self):
+    self.tracker.stopTracker()
+    self.posture.goToPosture("StandInit",0.5)
+    self.text.say("I'm done")
+    self.tracker.toggleSearch(False)
+    #put clean-up code here
+    pass
+
+def onInput_onStart(self):
+    self.tracker.stopTracker()
+    pass
+
+def onInput_onStop(self):
+
+    self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+    self.onStopped() #activate the output of the box
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Search Code:</p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<p>from naoqi import ALProxy
+class MyClass(GeneratedClass):
+    def <strong>init</strong>(self):
+        GeneratedClass.<strong>init</strong>(self)
+        self.text = ALProxy("ALTextToSpeech")
+        self.move =ALProxy("ALMotion")
+        self.color = ALProxy("ALColorBlobDectection")</p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<pre><code>    self.color.setColor(216,225,16,50)
+    self.color.setObjectProperties(15,.050,"Circle")
 
-<h3>
-<a id="rather-drive-stick" class="anchor" href="#rather-drive-stick" aria-hidden="true"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+def onLoad(self):
+    #put initialization code here
+    pass
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+def onUnload(self):
+    #put clean-up code here
+    pass
 
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+def onInput_onStart(self):
+    #self.onStopped() #activate the output of the box
+    names = ['HeadYaw','HeadPitch']
+    times = [[2.0],[2,0]]
+    self.move.angleInterpolation(names,[0.0,0.3],times,True)
+    p = False
+    self.stopIt(p)
+    self.move.angleInterpolation(names,[0.0,0.1],times,True)
+    self.onStopped()
+    pass
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+def onInput_onStop(self):
+    self.stopIt(True)
+    #self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+    #self.onStopped() #activate the output of the box
 
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+def stopIt(self,p):
+    names = ['HeadYaw','HeadPitch']
+    times = [[2.0],[2,0]]
+    count = 0
+    if p == True:
+        self.text.say("found the ball")
 
-<p>Having trouble with Pages? Check out the documentation at <a href="https://help.github.com/pages">https://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+    while p == False;
+        self.move.angleInterpolation(names,[1.0,0.3],times,True)
+        self.move.angleInterpolation(names,[-1.0,0.3],times,True)
+    count = count+1
+    if count == 3:
+        p = True
+</code></pre>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/CSC212">CSC212</a></p>
